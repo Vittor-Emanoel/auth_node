@@ -1,11 +1,11 @@
-// eslint-disable-next-line quotes
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
+
+import { env } from "../config/env";
 import { InvalidCredentials } from "../errors/InvalidCredentials";
 import { prismaClient } from "../libs/prisma";
 
 interface IInput {
-  name: string;
   email: string;
   password: string;
 }
@@ -32,7 +32,9 @@ export class SignInUseCase {
       throw new InvalidCredentials();
     }
 
-    const accessToken = sign({ sub: account.id }, process.env.JWT_SECRET!);
+    const accessToken = sign({ sub: account.id }, env.jwtSecret, {
+      expiresIn: "1d",
+    });
 
     return {
       accessToken,

@@ -1,6 +1,5 @@
-// eslint-disable-next-line quotes
 import { hash } from "bcryptjs";
-import { AccountAlreadyExistsError } from "../errors/AccountAlreadyExists";
+import { AccountAlreadyExists } from "../errors/AccountAlreadyExists";
 import { prismaClient } from "../libs/prisma";
 
 interface IInput {
@@ -12,6 +11,8 @@ interface IInput {
 type IOutput = void;
 
 export class SignUpUseCase {
+  constructor(private readonly salt: number) {}
+
   async execute({ name, password, email }: IInput): Promise<IOutput> {
     const accountAlreadyExists = await prismaClient.account.findUnique({
       where: {
@@ -20,10 +21,10 @@ export class SignUpUseCase {
     });
 
     if (accountAlreadyExists) {
-      throw new AccountAlreadyExistsError();
+      throw new AccountAlreadyExists();
     }
 
-    const hashedPassword = await hash(password, 8);
+    const hashedPassword = await hash(password, this.salt);
 
     await prismaClient.account.create({
       data: {

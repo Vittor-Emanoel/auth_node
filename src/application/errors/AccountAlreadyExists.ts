@@ -1,3 +1,3 @@
-export class AccountAlreadyExistsError extends Error {
+export class AccountAlreadyExists extends Error {
   name: "AccountAlreadyExists";
 }
