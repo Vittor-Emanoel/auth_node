@@ -21,10 +21,17 @@ export class AuthenticationMiddleware implements IMiddleware {
     }
 
     try {
-      verify(authorization, env.JWT);
+      const [bearer, token] = authorization.split(" ");
+
+      if (bearer !== "Bearer") {
+        throw new Error();
+      }
+
+      const payload = verify(token, env.jwtSecret);
+
       return {
         data: {
-          accountId: "123",
+          accountId: payload.sub,
         },
       };
     } catch (error) {
