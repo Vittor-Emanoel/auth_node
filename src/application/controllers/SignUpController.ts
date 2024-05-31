@@ -1,12 +1,14 @@
 import { ZodError, z } from "zod";
 import { AccountAlreadyExists } from "../errors/AccountAlreadyExists";
-import { IController, IRequest, IResponse } from "../interfaces/IController";
+import { IController, IResponse } from "../interfaces/IController";
+import { IRequest } from "../interfaces/IRequest";
 import { SignUpUseCase } from "../useCases/SignUpUseCase";
 
 const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  roleId: z.string().uuid(),
 });
 
 export class SignUpController implements IController {
@@ -14,9 +16,9 @@ export class SignUpController implements IController {
 
   async handle({ body }: IRequest): Promise<IResponse> {
     try {
-      const { email, name, password } = schema.parse(body);
+      const { email, name, password,roleId } = schema.parse(body);
 
-      await this.signUpUseCase.execute({ email, name, password });
+      await this.signUpUseCase.execute({ email, name, password, roleId });
 
       return {
         statusCode: 204,
